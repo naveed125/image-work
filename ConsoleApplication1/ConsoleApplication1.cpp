@@ -96,7 +96,7 @@ MyImg* get_subregion(MyImg* src, int top, int left, int bottom, int right) {
         }
     }
     cropped = new MyImg();
-    cropped->data = p;
+    cropped->data = data;
     cropped->width = w;
     cropped->height = h;
     cropped->channels = src->channels;
