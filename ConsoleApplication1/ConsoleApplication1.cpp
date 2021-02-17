@@ -74,7 +74,7 @@ MyImg* load_jpeg_file(const string& filename)
     return img;
 
 }
-MyImg* get_subregion(MyImg* scr, int top, int left, int bottom, int right) {
+MyImg* get_subregion(MyImg* src, int top, int left, int bottom, int right) {
     int w, h;
     w = right - left;
     h = bottom - top;
@@ -82,24 +82,24 @@ MyImg* get_subregion(MyImg* scr, int top, int left, int bottom, int right) {
     unsigned char* data;
     data = (unsigned char*)malloc(w * h * 3);
 
-    int move = top * scr->width * scr->channels + (left * scr->channels);
-    cout << move << endl;
-    cout << scr->width;
+    int move = top * src->width * src->channels + (left * src->channels);
+    cout << "move is:" << move << endl;
+    cout << "src width:" << src->width;
     unsigned char* p = data;
     for (int r = 0; r < h; r++) {
         for (int c = 0; c < w; c++) {
-            *(p) = *(scr->data + move);
-            *(p + 1) = *(scr->data + move + 1);
-            *(p + 2) = *(scr->data + move + 2);
+            *(p) = *(src->data + move);
+            *(p + 1) = *(src->data + move + 1);
+            *(p + 2) = *(src->data + move + 2);
             p = p + 3;
-            scr->data = scr->data + move + 3;
+            src->data = src->data + move + 3;
         }
     }
     cropped = new MyImg();
     cropped->data = p;
     cropped->width = w;
     cropped->height = h;
-    cropped->channels = scr->channels;
+    cropped->channels = src->channels;
     return cropped;
 
 }
@@ -183,6 +183,11 @@ int main()
     //print_img_info(img);
     //stbi_image_free(img->data);
     MyImg* imgn = load_jpeg_file("apple-hh.jpg");
+    if (imgn == 0) {
+        cout << "Faild to load apple-hh.jpg" << endl;
+        return 2;
+    }
+
     MyImg* img2 = get_subregion(imgn, 50, 5, 250, 250);
     print_img_info(img2);
     save_to_jpeg_file("apple-crop.jpg", img2);
