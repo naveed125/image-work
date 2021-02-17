@@ -43,7 +43,7 @@ void print_img_info(MyImg* img)
 
 }
 
-void delete_img(MyImg** img)
+void delete_img(MyImg* img)
 {
     delete img;
 
@@ -78,24 +78,23 @@ MyImg* get_subregion(MyImg* src, int top, int left, int bottom, int right) {
     int w, h;
     w = right - left;
     h = bottom - top;
-    MyImg* cropped = 0;
-    unsigned char* data;
-    data = (unsigned char*)malloc(w * h * 3);
+    unsigned char* data = (unsigned char*)malloc(w * h * 3);
+    memset(data, 0, w * h * 3);
 
-    int move = top * src->width * src->channels + (left * src->channels);
+    int move = (top * src->width + left) * src->channels;
     cout << "move is:" << move << endl;
-    cout << "src width:" << src->width;
     unsigned char* p = data;
     for (int r = 0; r < h; r++) {
         for (int c = 0; c < w; c++) {
             *(p) = *(src->data + move);
             *(p + 1) = *(src->data + move + 1);
             *(p + 2) = *(src->data + move + 2);
-            p = p + 3;
-            src->data = src->data + move + 3;
+            p += 3;
+            move += 3;
         }
     }
-    cropped = new MyImg();
+
+    MyImg* cropped = new MyImg();
     cropped->data = data;
     cropped->width = w;
     cropped->height = h;
@@ -187,13 +186,15 @@ int main()
         cout << "Faild to load apple-hh.jpg" << endl;
         return 2;
     }
+    print_img_info(imgn);
 
-    MyImg* img2 = get_subregion(imgn, 50, 5, 250, 250);
-    print_img_info(img2);
-    save_to_jpeg_file("apple-crop.jpg", img2);
+    MyImg* croppedImage = get_subregion(imgn, 100, 100, 200, 200);
+    print_img_info(croppedImage);
+    save_to_jpeg_file("apple-crop.jpg", croppedImage);
+
     // Memory cleanup
-    //stbi_image_free(img->data);
-    delete_img(&img);
+    stbi_image_free(croppedImage->data);
+    delete_img(croppedImage);
 
     return 0;
 }
